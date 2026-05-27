@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>臺灣遊蕩犬分析</title>
+    <!-- 引入 Chart.js 處理動態圖表 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; line-height: 1.8; color: #333; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }
+        header { text-align: center; padding: 50px 20px; background: linear-gradient(135deg, #d63031, #e17055); color: white; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .author { font-size: 1.1em; opacity: 0.9; margin-top: 10px; }
+        section { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 35px; }
+        h2 { border-left: 6px solid #d63031; padding-left: 15px; color: #2d3436; margin-bottom: 25px; }
+        .map-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border: 2px solid #eee; border-radius: 8px; margin-bottom: 20px; }
+        .map-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .analysis-box { background: #fffcf0; border-left: 5px solid #fdcb6e; padding: 20px; border-radius: 4px; font-size: 1em; margin-top: 20px; }
+        canvas { width: 100% !important; max-height: 600px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>臺灣遊蕩犬分析</h1>
+    <p class="author">作者：陳畇延</p>
+</header>
+
+<section id="preface">
+    <h2>前言</h2>
+    <p>
+        本網頁聚焦於 113 年臺灣各縣市遊蕩犬分布現況，具備極高的社會價值與政策參考意義 [1], [2]。透過數據視覺化，我們能直觀觀察到全國總計 141,584 隻遊蕩犬的空間分布與人口比例關係 [1]。資料來源主要參考農業部「動物保護資訊網」之最新調查報告 [1], [3], [2]。遊蕩犬數量不僅反映地方收容與絕育資源的配置壓力，更直接影響居民生活安全與環境生態 [4]。透過分析如臺東縣高達 4.04 的每百人犬數比例，能協助政府針對高風險區域執行更精確的結紮與管理策略 [1]。
+    </p>
+</section>
+
+<section id="google-map">
+    <h2>互動式 Google Map：遊蕩犬估計數分布</h2>
+    <div class="map-container">
+        <!-- 嵌入 Google My Maps 框架 -->
+        <iframe src="https://www.google.com/maps/d/embed?mid=請替換成您的地圖ID" width="640" height="480"></iframe>
+    </div>
+    <div class="analysis-box">
+        <strong>關鍵數字分析：</strong>
+        根據 113 年數據，全台遊蕩犬總數達 141,584 隻。臺南市以 19,990 隻位居首位，其次為嘉義縣 16,944 隻 [1]。從地圖空間分布可見，南部縣市與農業大縣的遊蕩犬聚集情形最為嚴峻，是資源投入的首要區域。
+    </div>
+</section>
+
+<section id="bar-chart">
+    <h2>互動式橫條圖：每百人遊蕩犬數排行</h2>
+    <canvas id="perHundredChart"></canvas>
+    <div class="analysis-box">
+        <strong>關鍵數字分析：</strong>
+        排序顯示，臺東縣（4.04 隻/百人）與嘉義縣（3.50 隻/百人）的人犬密度比遠超全台平均 [1]。這代表在人口密度較低、土地廣大的縣市，人犬重疊壓力最大，需強化偏鄉的絕育與源頭管理計畫。
+    </div>
+</section>
+
+<script>
+    // 依據來源資料整理，並按「每百人遊蕩犬數」由大到小排序
+    const sortedData = [
+        { name: "臺東縣", count: 8551, per100: 4.04 },
+        { name: "嘉義縣", count: 16944, per100: 3.50 },
+        { name: "花蓮縣", count: 6983, per100: 2.20 },
+        { name: "南投縣", count: 9644, per100: 2.02 },
+        { name: "苗栗縣", count: 7403, per100: 1.38 },
+        { name: "屏東縣", count: 10024, per100: 1.26 },
+        { name: "臺南市", count: 19990, per100: 1.07 },
+        { name: "基隆市", count: 3112, per100: 0.86 },
+        { name: "彰化縣", count: 9313, per100: 0.75 },
+        { name: "雲林縣", count: 4934, per100: 0.75 },
+        { name: "澎湖縣", count: 520, per100: 0.48 },
+        { name: "新竹縣", count: 2396, per100: 0.41 },
+        { name: "高雄市", count: 10200, per100: 0.37 },
+        { name: "宜蘭縣", count: 1630, per100: 0.36 },
+        { name: "嘉義市", count: 906, per100: 0.34 },
+        { name: "桃園市", count: 7893, per100: 0.34 },
+        { name: "臺中市", count: 8542, per100: 0.30 },
+        { name: "新北市", count: 9982, per100: 0.25 },
+        { name: "連江縣", count: 26, per100: 0.19 },
+        { name: "金門縣", count: 167, per100: 0.12 },
+        { name: "新竹市", count: 516, per100: 0.11 },
+        { name: "臺北市", count: 1908, per100: 0.08 }
+    ];
+
+    // 變色邏輯：根據「總數」決定顏色深度，強調急迫感
+    const getColorByCount = (count) => {
+        if (count > 15000) return '#d63031'; // 極深紅 (臺南、嘉義縣)
+        if (count > 8000) return '#e17055';  // 橙紅
+        if (count > 3000) return '#fdcb6e';  // 暖黃
+        return '#fab1a0'; // 淺橘
+    };
+
+    const ctx = document.getElementById('perHundredChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedData.map(d => d.name),
+            datasets: [{
+                label: '每百人遊蕩犬數',
+                data: sortedData.map(d => d.per100),
+                backgroundColor: sortedData.map(d => getColorByCount(d.count)),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y', // 橫條圖
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const data = sortedData[context.dataIndex];
+                            return ` 每百人：${data.per100} 隻 | 總數：${data.count.toLocaleString()} 隻`;
+                        }
+                    }
+                }
+            },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const i = elements.index;
+                    const d = sortedData[i];
+                    alert(`【${d.name} 詳細數據】\n遊蕩犬估計數：${d.count} 隻\n每百人比例：${d.per100} 隻`);
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
