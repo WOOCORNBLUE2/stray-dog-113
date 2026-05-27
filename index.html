@@ -3,127 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>臺灣遊蕩犬分析</title>
-    <!-- 引入 Chart.js 處理動態圖表 -->
+    <title>113年臺灣遊蕩犬分析</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; line-height: 1.8; color: #333; max-width: 1000px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; }
-        header { text-align: center; padding: 50px 20px; background: linear-gradient(135deg, #d63031, #e17055); color: white; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .author { font-size: 1.1em; opacity: 0.9; margin-top: 10px; }
-        section { background: white; padding: 35px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 35px; }
-        h2 { border-left: 6px solid #d63031; padding-left: 15px; color: #2d3436; margin-bottom: 25px; }
-<div class="https://www.google.com/maps/d/edit?mid=1TbRIcX4o_YktGVbFntfBXyPsPLUEe9Y&ll=24.074531930122276%2C120.104023&z=8">
-  <iframe src="https://www.google.com/maps/d/edit?mid=1TbRIcX4o_YktGVbFntfBXyPsPLUEe9Y&ll=24.074531930122276%2C120.104023&z=8" allowfullscreen="" loading="lazy"></iframe>
-</div>
-        .analysis-box { background: #fffcf0; border-left: 5px solid #fdcb6e; padding: 20px; border-radius: 4px; font-size: 1em; margin-top: 20px; }
-        canvas { width: 100% !important; max-height: 600px; }
+        :root { --main: #d63031; --bg: #f8f9fa; }
+        body { font-family: sans-serif; line-height: 1.6; color: #333; background: var(--bg); margin: 0; }
+        header { background: #2d3436; color: white; text-align: center; padding: 60px 20px; }
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+        section { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { border-left: 5px solid var(--main); padding-left: 15px; }
+        .map-box { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border: 1px solid #ddd; }
+        .map-box iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .analysis { background: #fff5f5; border-left: 4px solid var(--main); padding: 15px; margin-top: 15px; font-weight: bold; }
+        footer { text-align: center; padding: 20px; font-size: 0.8em; color: #666; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>臺灣遊蕩犬分析</h1>
-    <p class="author">作者：陳畇延</p>
+    <h1>113年臺灣遊蕩犬分析</h1>
+    <p>執行製作：陳畇延</p>
 </header>
 
-<section id="preface">
-    <h2>前言</h2>
-    <p>
-        本網頁聚焦於 113 年臺灣各縣市遊蕩犬分布現況，具備極高的社會價值與政策參考意義 [1], [2]。透過數據視覺化，我們能直觀觀察到全國總計 141,584 隻遊蕩犬的空間分布與人口比例關係 [1]。資料來源主要參考農業部「動物保護資訊網」之最新調查報告 [1], [3], [2]。遊蕩犬數量不僅反映地方收容與絕育資源的配置壓力，更直接影響居民生活安全與環境生態 [4]。透過分析如臺東縣高達 4.04 的每百人犬數比例，能協助政府針對高風險區域執行更精確的結紮與管理策略 [1]。
-    </p>
-</section>
+<div class="container">
+    <section>
+        <h2>研究前言</h2>
+        <p>
+            本網頁呈現 113 年全臺遊蕩犬分布調查，旨在提升動保意識。全臺遊蕩犬估計達 **141,584 隻** [1, 2]。數據源自農業部「動物保護資訊網」，結合 112 年人口統計，反映各縣市收容壓力與人犬衝突風險 [1, 2]。分析重點包含總數之最與人口比例之冠，供精準絕育與資源配置參考 [2]。
+        </p>
+    </section>
 
-<section id="google-map">
-    <h2>互動式 Google Map：遊蕩犬估計數分布</h2>
-    <div class="map-container">
-        <!-- 嵌入 Google My Maps 框架 -->
-        <iframe src="https://www.google.com/maps/d/edit?mid=1TbRIcX4o_YktGVbFntfBXyPsPLUEe9Y&ll=24.074531930122276%2C120.104023&z=8" width="640" height="480"></iframe>
-    </div>
-    <div class="analysis-box">
-        <strong>關鍵數字分析：</strong>
-        根據 113 年數據，全台遊蕩犬總數達 141,584 隻。臺南市以 19,990 隻位居首位，其次為嘉義縣 16,944 隻 [1]。從地圖空間分布可見，南部縣市與農業大縣的遊蕩犬聚集情形最為嚴峻，是資源投入的首要區域。
-    </div>
-</section>
+    <section>
+        <h2>互動式分佈地圖</h2>
+        <div class="map-box">
+            <iframe src="https://www.google.com/maps/d/embed?mid=您的地圖ID"></iframe>
+        </div>
+        <div class="analysis">
+            空間分析：113 年全臺遊蕩犬估計 141,584 隻 [1, 2]。其中 **臺南市 (19,990 隻)** 與 **嘉義縣 (16,944 隻)** 數量居冠 [1, 2]。南部及農業大縣聚集情形最嚴峻，為資源投入首要區域 [1, 2]。
+        </div>
+    </section>
 
-<section id="bar-chart">
-    <h2>互動式橫條圖：每百人遊蕩犬數排行</h2>
-    <canvas id="perHundredChart"></canvas>
-    <div class="analysis-box">
-        <strong>關鍵數字分析：</strong>
-        排序顯示，臺東縣（4.04 隻/百人）與嘉義縣（3.50 隻/百人）的人犬密度比遠超全台平均 [1]。這代表在人口密度較低、土地廣大的縣市，人犬重疊壓力最大，需強化偏鄉的絕育與源頭管理計畫。
-    </div>
-</section>
+    <section>
+        <h2>每百人遊蕩犬數排行</h2>
+        <canvas id="rankingChart"></canvas>
+        <div class="analysis">
+            指標分析：以人口比例分析，**臺東縣 (4.04)** 與 **嘉義縣 (3.50)** 每百人犬數最高，遠超全臺平均 0.605 [1, 2]。顯示偏鄉及低人口密度區壓力較大，需強化源頭管理 [1, 2]。
+        </div>
+    </section>
+</div>
+
+<footer>
+    資料來源：農業部動物保護資訊網 (113年度調查報告)
+</footer>
 
 <script>
-    // 依據來源資料整理，並按「每百人遊蕩犬數」由大到小排序
-    const sortedData = [
-        { name: "臺東縣", count: 8551, per100: 4.04 },
-        { name: "嘉義縣", count: 16944, per100: 3.50 },
-        { name: "花蓮縣", count: 6983, per100: 2.20 },
-        { name: "南投縣", count: 9644, per100: 2.02 },
-        { name: "苗栗縣", count: 7403, per100: 1.38 },
-        { name: "屏東縣", count: 10024, per100: 1.26 },
-        { name: "臺南市", count: 19990, per100: 1.07 },
-        { name: "基隆市", count: 3112, per100: 0.86 },
-        { name: "彰化縣", count: 9313, per100: 0.75 },
-        { name: "雲林縣", count: 4934, per100: 0.75 },
-        { name: "澎湖縣", count: 520, per100: 0.48 },
-        { name: "新竹縣", count: 2396, per100: 0.41 },
-        { name: "高雄市", count: 10200, per100: 0.37 },
-        { name: "宜蘭縣", count: 1630, per100: 0.36 },
-        { name: "嘉義市", count: 906, per100: 0.34 },
-        { name: "桃園市", count: 7893, per100: 0.34 },
-        { name: "臺中市", count: 8542, per100: 0.30 },
-        { name: "新北市", count: 9982, per100: 0.25 },
-        { name: "連江縣", count: 26, per100: 0.19 },
-        { name: "金門縣", count: 167, per100: 0.12 },
-        { name: "新竹市", count: 516, per100: 0.11 },
-        { name: "臺北市", count: 1908, per100: 0.08 }
+    const data = [
+        { n: "臺東縣", c: 8551, r: 4.04 }, { n: "嘉義縣", c: 16944, r: 3.50 }, { n: "花蓮縣", c: 6983, r: 2.20 },
+        { n: "南投縣", c: 9644, r: 2.02 }, { n: "苗栗縣", c: 7403, r: 1.38 }, { n: "屏東縣", c: 10024, r: 1.26 },
+        { n: "臺南市", c: 19990, r: 1.07 }, { n: "基隆市", c: 3112, r: 0.86 }, { n: "彰化縣", c: 9313, r: 0.75 },
+        { n: "雲林縣", c: 4934, r: 0.75 }, { n: "澎湖縣", c: 520, r: 0.48 }, { n: "新竹縣", c: 2396, r: 0.41 },
+        { n: "高雄市", c: 10200, r: 0.37 }, { n: "宜蘭縣", c: 1630, r: 0.36 }, { n: "嘉義市", c: 906, r: 0.34 },
+        { n: "桃園市", c: 7893, r: 0.34 }, { n: "臺中市", c: 8542, r: 0.30 }, { n: "新北市", c: 9982, r: 0.25 },
+        { n: "連江縣", c: 26, r: 0.19 }, { n: "金門縣", c: 167, r: 0.12 }, { n: "新竹市", c: 516, r: 0.11 },
+        { n: "臺北市", c: 1908, r: 0.08 }
     ];
 
-    // 變色邏輯：根據「總數」決定顏色深度，強調急迫感
-    const getColorByCount = (count) => {
-        if (count > 15000) return '#d63031'; // 極深紅 (臺南、嘉義縣)
-        if (count > 8000) return '#e17055';  // 橙紅
-        if (count > 3000) return '#fdcb6e';  // 暖黃
-        return '#fab1a0'; // 淺橘
-    };
-
-    const ctx = document.getElementById('perHundredChart').getContext('2d');
-    new Chart(ctx, {
+    new Chart(document.getElementById('rankingChart'), {
         type: 'bar',
         data: {
-            labels: sortedData.map(d => d.name),
+            labels: data.map(d => d.n),
             datasets: [{
                 label: '每百人遊蕩犬數',
-                data: sortedData.map(d => d.per100),
-                backgroundColor: sortedData.map(d => getColorByCount(d.count)),
-                borderWidth: 1
+                data: data.map(d => d.r),
+                backgroundColor: data.map(d => d.c > 10000 ? '#d63031' : '#ff7675')
             }]
         },
-        options: {
-            indexAxis: 'y', // 橫條圖
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: (context) => {
-                            const data = sortedData[context.dataIndex];
-                            return ` 每百人：${data.per100} 隻 | 總數：${data.count.toLocaleString()} 隻`;
-                        }
-                    }
-                }
-            },
-            onClick: (e, elements) => {
-                if (elements.length > 0) {
-                    const i = elements.index;
-                    const d = sortedData[i];
-                    alert(`【${d.name} 詳細數據】\n遊蕩犬估計數：${d.count} 隻\n每百人比例：${d.per100} 隻`);
-                }
-            }
+        options: { 
+            indexAxis: 'y', 
+            plugins: { tooltip: { callbacks: { label: (c) => ` 比例: ${c.raw} | 總量: ${data[c.dataIndex].c}` } } }
         }
     });
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
