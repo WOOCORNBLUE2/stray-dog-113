@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>113年臺灣遊蕩犬分析</title>
+
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"
+/>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+:root{
+    --main:#d63031;
+    --bg:#f5f6fa;
+}
+
+body{
+    margin:0;
+    font-family:"Noto Sans TC",sans-serif;
+    background:var(--bg);
+    color:#333;
+}
+
+header{
+    background:#2d3436;
+    color:white;
+    text-align:center;
+    padding:50px 20px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:20px;
+}
+
+section{
+    background:white;
+    margin-bottom:20px;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+h2{
+    border-left:6px solid var(--main);
+    padding-left:12px;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:
+    repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.card h3{
+    margin:0;
+    color:#666;
+}
+
+.card p{
+    font-size:2rem;
+    font-weight:bold;
+    color:var(--main);
+}
+
+#map{
+    height:650px;
+    border-radius:12px;
+}
+
+.analysis{
+    margin-top:15px;
+    padding:15px;
+    background:#fff5f5;
+    border-left:5px solid var(--main);
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    color:#666;
+}
+
+@media(max-width:768px){
+
+    #map{
+        height:450px;
+    }
+
+    .card p{
+        font-size:1.5rem;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>113年臺灣遊蕩犬分析</h1>
+    <p>執行製作：陳畇延</p>
+</header>
+
+<div class="container">
+
+<div class="cards">
+
+<div class="card">
+    <h3>全臺總數</h3>
+    <p>141,584</p>
+</div>
+
+<div class="card">
+    <h3>數量最多</h3>
+    <p>臺南市</p>
+</div>
+
+<div class="card">
+    <h3>比例最高</h3>
+    <p>臺東縣</p>
+</div>
+
+</div>
+
+<section>
+
+<h2>研究前言</h2>
+
+<p>
+113年度全臺遊蕩犬估計數量達141,584隻，
+其中臺南市與嘉義縣數量最高，
+臺東縣每百人遊蕩犬數則居全國之冠。
+</p>
+
+</section>
+
+<section>
+
+<h2>互動式遊蕩犬地圖</h2>
+
+<div id="map"></div>
+
+<div id="infoBox" class="analysis">
+點擊地圖上的縣市查看資料
+</div>
+
+</section>
+
+<section>
+
+<h2>每百人遊蕩犬數排行</h2>
+
+<canvas id="rankingChart"></canvas>
+
+</section>
+
+</div>
+
+<footer>
+資料來源：農業部動物保護資訊網（113年度）
+</footer>
+
+<script>
+
+const data = [
+
+{n:"臺東縣",c:8551,r:4.04},
+{n:"嘉義縣",c:16944,r:3.50},
+{n:"花蓮縣",c:6983,r:2.20},
+{n:"南投縣",c:9644,r:2.02},
+{n:"苗栗縣",c:7403,r:1.38},
+{n:"屏東縣",c:10024,r:1.26},
+{n:"臺南市",c:19990,r:1.07},
+{n:"基隆市",c:3112,r:0.86},
+{n:"彰化縣",c:9313,r:0.75},
+{n:"雲林縣",c:4934,r:0.75},
+{n:"澎湖縣",c:520,r:0.48},
+{n:"新竹縣",c:2396,r:0.41},
+{n:"高雄市",c:10200,r:0.37},
+{n:"宜蘭縣",c:1630,r:0.36},
+{n:"嘉義市",c:906,r:0.34},
+{n:"桃園市",c:7893,r:0.34},
+{n:"臺中市",c:8542,r:0.30},
+{n:"新北市",c:9982,r:0.25},
+{n:"連江縣",c:26,r:0.19},
+{n:"金門縣",c:167,r:0.12},
+{n:"新竹市",c:516,r:0.11},
+{n:"臺北市",c:1908,r:0.08}
+
+];
+
+const dogData = {};
+
+data.forEach(d=>{
+    dogData[d.n]={
+        count:d.c,
+        ratio:d.r
+    };
+});
+
+const map = L.map('map').setView([23.8,121],7);
+
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+attribution:'© OpenStreetMap'
+}
+).addTo(map);
+
+function getColor(count){
+
+return count>15000 ? '#7f0000' :
+       count>10000 ? '#cb181d' :
+       count>5000 ? '#fb6a4a' :
+       count>2000 ? '#fcae91' :
+                     '#fee5d9';
+}
+
+let geoLayer;
+
+fetch(
+'https://raw.githubusercontent.com/g0v/twgeojson/master/json/twCounty2010.geo.json'
+)
+.then(res=>res.json())
+.then(json=>{
+
+geoLayer=L.geoJSON(json,{
+
+style:(feature)=>{
+
+const county=
+feature.properties.COUNTYNAME;
+
+const value=
+dogData[county]?.count || 0;
+
+return{
+fillColor:getColor(value),
+weight:1,
+color:"#fff",
+fillOpacity:0.8
+};
+
+},
+
+onEachFeature:(feature,layer)=>{
+
+const county=
+feature.properties.COUNTYNAME;
+
+const info=
+dogData[county];
+
+if(!info) return;
+
+layer.bindTooltip(
+`
+<b>${county}</b><br>
+遊蕩犬數:${info.count}<br>
+每百人:${info.ratio}
+`
+);
+
+layer.on('click',()=>{
+
+document.getElementById(
+'infoBox'
+).innerHTML=
+`
+<h3>${county}</h3>
+<p>遊蕩犬數量：
+${info.count.toLocaleString()}隻</p>
+
+<p>每百人遊蕩犬：
+${info.ratio}</p>
+`;
+
+});
+
+}
+
+}).addTo(map);
+
+});
+
+const chart = new Chart(
+
+document.getElementById(
+'rankingChart'
+),
+
+{
+type:'bar',
+
+data:{
+labels:data.map(d=>d.n),
+
+datasets:[{
+
+label:'每百人遊蕩犬數',
+
+data:data.map(d=>d.r),
+
+backgroundColor:data.map(d=>
+d.c>10000
+? '#d63031'
+: '#ff7675'
+)
+
+}]
+},
+
+options:{
+
+responsive:true,
+
+indexAxis:'y',
+
+plugins:{
+tooltip:{
+callbacks:{
+label:(ctx)=>
+`比例:${ctx.raw}
+總量:${data[ctx.dataIndex].c}`
+}
+}
+},
+
+onClick:(e,elements)=>{
+
+if(!elements.length) return;
+
+const county=
+data[elements[0].index].n;
+
+document.getElementById(
+'infoBox'
+).innerHTML=
+`
+<h3>${county}</h3>
+
+<p>遊蕩犬數量：
+${dogData[county].count.toLocaleString()}
+隻</p>
+
+<p>每百人：
+${dogData[county].ratio}</p>
+`;
+
+}
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
